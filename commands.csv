@@ -1,0 +1,2 @@
+!clear [Nummer] = Loescht die letzten [number] Nachrichten (max 99)
+!list [Rolle] = Listet alle Clanmember mit dieser Rolle auf
