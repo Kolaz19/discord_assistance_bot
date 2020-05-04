@@ -1,5 +1,8 @@
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.ChunkingFilter;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
 import javax.security.auth.login.LoginException;
 import java.io.File;
@@ -12,7 +15,11 @@ public class AssistanceBot {
 
     public static void main (String[] args) throws LoginException, InterruptedException {
 
-        gr_jda = JDABuilder.createDefault(AssistanceBot.getParameter("server.csv","server_token")).build();
+        gr_jda = JDABuilder.createDefault(AssistanceBot.getParameter("server.csv","server_token"))
+                            .setChunkingFilter(ChunkingFilter.ALL)
+                            .setMemberCachePolicy(MemberCachePolicy.ALL)
+                            .enableIntents(GatewayIntent.GUILD_MEMBERS)
+                            .build();
         //Wait till connection is ready
         gr_jda.awaitReady();
         gr_jda.addEventListener(new Listen(gr_jda));

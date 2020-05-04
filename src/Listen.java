@@ -38,7 +38,7 @@ public class Listen extends ListenerAdapter {
         if (!(ir_event.getAuthor().isBot()) && (ir_event.getTextChannel() == mr_jda.getTextChannelById(mv_channelIdBotCommand)) && !(lv_firstChar.equals("!"))) {
             lr_message.delete().queue();
             return;
-            //Delete message in current channel and post in botChannel if message is botcommand
+            //Delete message in current channel and post in botChannel if message is  botcommand
         } else if ((lv_firstChar.equals("!")) && (ir_event.getTextChannel() != mr_jda.getTextChannelById(mv_channelIdBotCommand))) {
             lr_message.delete().queue();
             String lv_messageInCommandChannel = "```css" + "\n" + lr_content + "   [" + lv_user + "]" + "\n" + "```";
