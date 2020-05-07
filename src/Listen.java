@@ -1,3 +1,4 @@
+import jdk.jfr.Event;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -5,6 +6,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.nio.channels.Channel;
 import java.util.List;
 import java.util.Scanner;
 
@@ -34,6 +36,7 @@ public class Listen extends ListenerAdapter {
 
 
 
+
         //If user posts in channel "botcommand", but it is no botcommand -> delete
         if (!(ir_event.getAuthor().isBot()) && (ir_event.getTextChannel() == mr_jda.getTextChannelById(mv_channelIdBotCommand)) && !(lv_firstChar.equals("!"))) {
             lr_message.delete().queue();
@@ -48,7 +51,7 @@ public class Listen extends ListenerAdapter {
 
 
         //commands
-        if (la_content[0].equals("!commands")) {
+        if (la_content[0].equals("!commands") && la_content[1].equals(null)) {
             try {
                 Scanner lr_scanner = new Scanner(new File("commands.csv"));
                 String lv_outputCommands = lr_scanner.nextLine() + "\n";
@@ -64,16 +67,39 @@ public class Listen extends ListenerAdapter {
             if (!this.checkRole(ir_event.getMember(),AssistanceBot.getParameter("server.csv","name_of_MOD_role"))) {
                 return;
             }
-            int lv_messagesToRetrieve = Integer.parseInt(la_content[1]);
-            List<Message> la_history;
-            MessageHistory.MessageRetrieveAction lr_history = lr_channel.getHistoryBefore(ir_event.getMessageId(),lv_messagesToRetrieve);
-            la_history = lr_history.complete().getRetrievedHistory();
+
+            int lv_numberOfMessages;
+            try {
+                lv_numberOfMessages = Integer.valueOf(la_content[1]);
+            } catch (Exception ex) {
+                return;
+            }
+
+            List<Message> la_history = this.getPastMessages(lv_numberOfMessages,lr_channel,ir_event);
+            Member lr_member = null;
+
+            try {
+                    lr_member = mr_guild.getMembersByEffectiveName(la_content[2], true).get(0);
+            } catch (Exception ex) {
+
+            }
 
             for (Message lr_currentItem : la_history) {
-                lr_currentItem.delete().queue();
+                if ((lr_member == lr_currentItem.getMember()) || (la_content.length == 2)) {
+                    lr_currentItem.delete().queue();
+                }
             }
         } else if (la_content[0].equals("!list")) {
-            List<Member> la_members = mr_guild.getMembersWithRoles(mr_guild.getRolesByName(la_content[1],true));
+            List<Role> la_roles;
+            try {
+                la_roles = mr_guild.getRolesByName(la_content[1], true);
+            } catch (Exception ex) {
+                return;
+            }
+            if (la_roles.isEmpty()) {
+                return;
+            }
+            List<Member> la_members = mr_guild.getMembersWithRoles(la_roles);
             String lv_output = "";
             for (Member lr_currentItem : la_members) {
                 lv_output += lr_currentItem.getEffectiveName() + "\n";
@@ -81,6 +107,8 @@ public class Listen extends ListenerAdapter {
             lr_channel.sendMessage(lv_output).queue();
         }
     }
+
+
 
     public boolean checkRole (Member iv_member,String iv_nameOfRole) {
         boolean lv_isAuthorized = false;
@@ -91,6 +119,19 @@ public class Listen extends ListenerAdapter {
             }
         }
         return lv_isAuthorized;
+    }
+
+
+    public List<Message> getPastMessages (int iv_numberOfMessages, MessageChannel ir_channel, MessageReceivedEvent ir_event) {
+
+        if (iv_numberOfMessages > 100) {
+            iv_numberOfMessages = 99;
+        }
+
+        List<Message> la_history;
+        MessageHistory.MessageRetrieveAction lr_history = ir_channel.getHistoryBefore(ir_event.getMessageId(),iv_numberOfMessages);
+        la_history = lr_history.complete().getRetrievedHistory();
+        return la_history;
     }
 
 }

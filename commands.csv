@@ -1,2 +1,3 @@
 !clear [Nummer] = Loescht die letzten [number] Nachrichten (max 99)
+!clear [Nummer] [Name] = Durchsucht die letzten [Nummer] Nachrichten und löscht die Nachrichten des Users (max 99)
 !list [Rolle] = Listet alle Clanmember mit dieser Rolle auf

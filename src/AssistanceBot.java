@@ -14,7 +14,7 @@ public class AssistanceBot {
     public static JDA gr_jda;
 
     public static void main (String[] args) throws LoginException, InterruptedException {
-
+        //Connect via token and make sure all members are fetched
         gr_jda = JDABuilder.createDefault(AssistanceBot.getParameter("server.csv","server_token"))
                             .setChunkingFilter(ChunkingFilter.ALL)
                             .setMemberCachePolicy(MemberCachePolicy.ALL)
