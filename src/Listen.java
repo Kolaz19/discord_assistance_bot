@@ -51,7 +51,7 @@ public class Listen extends ListenerAdapter {
 
 
         //commands
-        if (la_content[0].equals("!commands") && la_content[1].equals(null)) {
+        if (la_content[0].equals("!commands") && (la_content.length == 1)) {
             try {
                 Scanner lr_scanner = new Scanner(new File("commands.csv"));
                 String lv_outputCommands = lr_scanner.nextLine() + "\n";
